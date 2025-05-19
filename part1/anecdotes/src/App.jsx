@@ -54,6 +54,11 @@ const App = () => {
       text="next anecdote"
       onClick={showRandomAnecdote}
       />
+
+      <BestAnecdote
+        anecdotes={anecdotes}
+        votes={votes}
+      />
       
     </div>
   )
@@ -62,10 +67,52 @@ const App = () => {
 const Anecdote = ({text, numVotes}) => {
   return (
     <div>
+      <h1>
+        Anecdote of the day
+      </h1>
       {text}
       <div>
       has {numVotes} votes
       </div>
+    </div>
+  )
+}
+
+const findIndexOfHighestVote = (votes) => {
+  // Get the entries as [index, voteCount] pairs
+  const entries = Object.entries(votes);
+  
+  // Find the entry with the highest vote count
+  let highestEntry = entries[0];
+  
+  for (let i = 1; i < entries.length; i++) {
+    if (entries[i][1] > highestEntry[1]) {
+      highestEntry = entries[i];
+    }
+  }
+  
+  // Return the index (as a number, not a string)
+  return Number(highestEntry[0]);
+}
+
+const BestAnecdote = ({anecdotes, votes}) => {
+  const highestVoteIdx = findIndexOfHighestVote(votes);
+  const bestQuote = anecdotes[highestVoteIdx];
+  const highestVote = votes[highestVoteIdx];
+  
+  console.log("highestVoteIdx ", highestVoteIdx);
+  console.log("bestQuote ", bestQuote);
+  console.log("highestVote ", highestVote);
+  // quit early if every vote count is 0
+  if (highestVote === 0) return null;
+
+  // else print most voted quote
+  return (
+    <div>
+      <h1>
+        Anecdote with most votes
+      </h1>
+      {bestQuote}
     </div>
   )
 }
