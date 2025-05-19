@@ -89,36 +89,35 @@ const Statistics = ({good, neutral, bad}) => {
         statistics
       </h1>
 
-      <Stat
+      <StatisticLine
         text="good"
         value={good}
       />
-      <Stat
+      <StatisticLine
         text="neutral"
         value={neutral}
       />
-      <Stat
+      <StatisticLine
         text="bad"
         value={bad}
       />
-      <Stat
+      <StatisticLine
         text="all"
         value={total}
       />
-      <Stat
+      <StatisticLine
         text="average"
         value={avg}
       />
-      <Stat
+      <StatisticLine
         text="positive"
         value={positivePct}
       />
     </div>
-    
   )
 }
 
-const Stat = ({text, value}) => {
+const StatisticLine = ({text, value}) => {
   return (
     <div>
       {text} {value}
