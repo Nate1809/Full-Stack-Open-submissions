@@ -71,6 +71,18 @@ const Statistics = ({good, neutral, bad}) => {
   const avg    = total ? (good - bad) / total : 0;      // common “score” formula
   const positivePct = total ? (good / total) * 100 : 0; // guard against ÷0
 
+  if (!total) {
+    // no feedback given yet
+    return (
+      <div>
+        <h1>
+        statistics
+      </h1>
+        No feedback given
+      </div>
+    )
+  }
+
   return (
     <div>
       <h1>
