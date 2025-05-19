@@ -67,32 +67,49 @@ const Button = (props) => {
 }
 
 const Statistics = ({good, neutral, bad}) => {
+  const total = good + neutral + bad;
+  const avg    = total ? (good - bad) / total : 0;      // common “score” formula
+  const positivePct = total ? (good / total) * 100 : 0; // guard against ÷0
+
   return (
     <div>
       <h1>
         statistics
       </h1>
+
       <Stat
         text="good"
-        counter={good}
+        value={good}
       />
       <Stat
         text="neutral"
-        counter={neutral}
+        value={neutral}
       />
       <Stat
         text="bad"
-        counter={bad}
+        value={bad}
+      />
+      <Stat
+        text="all"
+        value={total}
+      />
+      <Stat
+        text="average"
+        value={avg}
+      />
+      <Stat
+        text="positive"
+        value={positivePct}
       />
     </div>
     
   )
 }
 
-const Stat = ({text, counter}) => {
+const Stat = ({text, value}) => {
   return (
     <div>
-      {text} {counter}
+      {text} {value}
     </div>
   )
 }
