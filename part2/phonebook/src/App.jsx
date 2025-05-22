@@ -83,8 +83,8 @@ const App = () => {
       <Persons persons={persons} newFilter={newFilter}/>
 
       {/*  DEBUG SHOWW STATES */}
-      <div>debug name state: {newName}</div>
-      <div>debug number state: {newNumber}</div>
+      {/* <div>debug name state: {newName}</div>
+      <div>debug number state: {newNumber}</div> */}
 
     </div>
   );
