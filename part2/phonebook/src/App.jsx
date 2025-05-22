@@ -13,15 +13,21 @@ const App = () => {
     const nameObject = {
       name: newName
     }
-
-    // add new name to state
-    setPersons(persons.concat(nameObject))
-    // reset newName state
-    setNewName('')
+    // Check if name already exists
+    const personNames = persons.map(person => person.name)
+    if (personNames.includes(newName)) {
+      console.log(`${newName} already in Phonebook`)
+      alert(`${newName} is already added to phonebook`)
+    } else {
+      // add new name to state
+      setPersons(persons.concat(nameObject))
+      // reset newName state
+      setNewName('')
+    }
   }
 
   const handleNameChange = (event) => {
-    console.log(event.target.value)
+    // console.log(event.target.value)
     setNewName(event.target.value)
   }
 
