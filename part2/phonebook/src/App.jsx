@@ -8,15 +8,34 @@ const App = () => {
   ]) 
   const [newName, setNewName] = useState('')
 
+  const addName = (event) => {
+    event.preventDefault()
+    const nameObject = {
+      name: newName
+    }
+
+    // add new name to state
+    setPersons(persons.concat(nameObject))
+    // reset newName state
+    setNewName('')
+  }
+
+  const handleNameChange = (event) => {
+    console.log(event.target.value)
+    setNewName(event.target.value)
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
+      <form onSubmit={addName}>
         <div>
-          name: <input />
+          name: <input 
+            value={newName}
+            onChange={handleNameChange}
+          />
         </div>
         <div>
-          {/* need to add handler and prevent default */}
           <button type="submit">add</button>
         </div>
       </form>
