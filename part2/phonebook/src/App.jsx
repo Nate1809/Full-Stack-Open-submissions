@@ -12,15 +12,14 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
 
   // Get persons from json server
-  const hook = () => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+  useEffect( () => {
+    personService
+      .getAll()
+      .then(initialPersons => {
         console.log('promise fulfilled, data fetched from server')
-        setPersons(response.data)
+        setPersons(initialPersons)
       })
-  }
-  useEffect(hook, [])
+  }, [])
 
   // Form submit handler
   const addContact = (event) => {
@@ -39,15 +38,13 @@ const App = () => {
     }
 
     // Add contact to backend server
-    axios
-    .post('http://localhost:3001/persons', contactObject)
-    .then(response => {
-      console.log(response)
-      setPersons(persons.concat(response.data)) // add new name to state
-      // reset newName and newNumber state
-      setNewName('')
-      setNewNumber('')
-    })
+    personService
+      .create(contactObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
   };
 
   const handleNameChange = (event) => {
