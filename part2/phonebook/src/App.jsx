@@ -26,8 +26,7 @@ const App = () => {
     event.preventDefault();
     const contactObject = {
       name: newName,
-      number: newNumber,
-      id: String(persons.length + 1)
+      number: newNumber
     };
     // Check if name already exists
     const personNames = persons.map((person) => person.name);
@@ -62,6 +61,17 @@ const App = () => {
     setNewFilter(event.target.value);
   }
 
+  const handleDelete = id => {
+    const person = persons.find(p => p.id === id)
+    if(window.confirm(`Delete ${person.name}?`)){
+      personService
+      .deletePerson(id)
+      .then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      })
+    }
+  }
+
   return (
     <div>
       {/* Header */}
@@ -83,7 +93,7 @@ const App = () => {
       {/* Phonebook */}
       <h2>Numbers</h2>
 
-      <Persons persons={persons} newFilter={newFilter}/>
+      <Persons persons={persons} newFilter={newFilter} handleDelete={handleDelete}/>
 
       {/*  DEBUG SHOWW STATES */}
       {/* <div>debug name state: {newName}</div>
