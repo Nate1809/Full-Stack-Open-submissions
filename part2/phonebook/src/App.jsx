@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import personService from './services/persons'
 import axios from 'axios'
 
 const App = () => {
@@ -24,7 +25,7 @@ const App = () => {
   // Form submit handler
   const addContact = (event) => {
     event.preventDefault();
-    const nameObject = {
+    const contactObject = {
       name: newName,
       number: newNumber,
       id: String(persons.length + 1)
@@ -37,11 +38,16 @@ const App = () => {
       return;
     }
 
-    // add new name to state
-    setPersons(persons.concat(nameObject));
-    // reset newName and newNUmber state
-    setNewName("");
-    setNewNumber("");
+    // Add contact to backend server
+    axios
+    .post('http://localhost:3001/persons', contactObject)
+    .then(response => {
+      console.log(response)
+      setPersons(persons.concat(response.data)) // add new name to state
+      // reset newName and newNumber state
+      setNewName('')
+      setNewNumber('')
+    })
   };
 
   const handleNameChange = (event) => {
@@ -58,13 +64,6 @@ const App = () => {
     // console.log(event.target.value)
     setNewFilter(event.target.value);
   }
-
-  const personsToShow = newFilter === ""
-    ? persons
-    // if condition is true we add to list
-    : persons.filter(person => 
-      person.name.toLowerCase().includes(newFilter.toLowerCase())
-    )
 
   return (
     <div>
