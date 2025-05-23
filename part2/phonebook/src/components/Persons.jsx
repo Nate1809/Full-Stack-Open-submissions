@@ -1,6 +1,6 @@
 import Number from "./Number"; 
 
-const Persons = ( {persons, newFilter} ) => {
+const Persons = ( {persons, newFilter, handleDelete} ) => {
     const personsToShow = newFilter === ""
         ? persons
         // if condition is true we add to list
@@ -11,7 +11,7 @@ const Persons = ( {persons, newFilter} ) => {
     return (
         <ul>
             {personsToShow.map((person) => (
-                <Number key={person.id} person={person} />
+                <Number key={person.id} person={person} handleDelete={handleDelete}/>
             ))}
         </ul>
     )
