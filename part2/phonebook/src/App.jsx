@@ -28,11 +28,26 @@ const App = () => {
       name: newName,
       number: newNumber
     };
-    // Check if name already exists
+    // Check if name already exists and handle it
     const personNames = persons.map((person) => person.name);
     if (personNames.includes(newName)) {
       console.log(`${newName} already in Phonebook`);
-      alert(`${newName} is already added to phonebook`);
+      if( window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`) ){
+        // update number in backend
+        const existing_person = persons.find(n => n.name === newName)
+        const changedPerson = { ...existing_person, number: newNumber }
+        personService
+          .update(existing_person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id === existing_person.id ? returnedPerson : person))
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(error => {
+            console.error('Failed to update person:', error)
+            alert('Failed to update contact. Please try again.')
+          })
+      }
       return;
     }
 
