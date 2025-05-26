@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 import personService from './services/persons'
-import axios from 'axios'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [successMessage, setSuccessMessage] = useState(null)
+
 
   // Get persons from json server
   useEffect( () => {
@@ -20,6 +22,14 @@ const App = () => {
         setPersons(initialPersons)
       })
   }, [])
+
+  const showSuccessNotification = (message) => {
+    setSuccessMessage(message)
+
+    setTimeout(() => {
+      setSuccessMessage(null)
+    }, 5000)
+  }
 
   // Form submit handler
   const addContact = (event) => {
@@ -40,6 +50,9 @@ const App = () => {
           .update(existing_person.id, changedPerson)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id === existing_person.id ? returnedPerson : person))
+            // show notification
+            showSuccessNotification(`Updated ${returnedPerson.name}'s number`)
+            // reset states
             setNewName('')
             setNewNumber('')
           })
@@ -51,11 +64,14 @@ const App = () => {
       return;
     }
 
-    // Add contact to backend server
+    // ELSE, Add contact to backend server
     personService
       .create(contactObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+        // show success notification
+        showSuccessNotification(`Added ${returnedPerson.name}`)
+        // Reset states
         setNewName('')
         setNewNumber('')
       })
@@ -91,6 +107,7 @@ const App = () => {
     <div>
       {/* Header */}
       <h2>Phonebook</h2>
+      <Notification message={successMessage} isError={false}/>
 
       {/* filter contacts by name */}
       <Filter value={newFilter} onChange={handleFilterChange}/>
