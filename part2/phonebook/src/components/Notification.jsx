@@ -23,10 +23,8 @@ const Notification = ({ message, isError }) => {
         marginBottom: '10px'
     }
 
-    const notificationStyle = successStyle
-    if (isError){
-        notificationStyle = errorStyle
-    }
+    const notificationStyle = isError ? errorStyle : successStyle
+    
     return (
         <div style={notificationStyle}>
             {message}

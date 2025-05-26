@@ -10,7 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [notification, setNotification] = useState({ message: null, isError: false })
 
 
   // Get persons from json server
@@ -23,11 +23,11 @@ const App = () => {
       })
   }, [])
 
-  const showSuccessNotification = (message) => {
-    setSuccessMessage(message)
-
+  // Helper function for notifications
+  const showNotification = (message, isError = false) => {
+    setNotification({ message, isError })
     setTimeout(() => {
-      setSuccessMessage(null)
+      setNotification({ message: null, isError: false })
     }, 5000)
   }
 
@@ -51,14 +51,14 @@ const App = () => {
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id === existing_person.id ? returnedPerson : person))
             // show notification
-            showSuccessNotification(`Updated ${returnedPerson.name}'s number`)
+            showNotification(`Updated ${returnedPerson.name}'s number`, false)
             // reset states
             setNewName('')
             setNewNumber('')
           })
           .catch(error => {
             console.error('Failed to update person:', error)
-            alert('Failed to update contact. Please try again.')
+            showNotification(`Error: Failed to update contact (${person.name})`, true) // error
           })
       }
       return;
@@ -70,7 +70,7 @@ const App = () => {
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
         // show success notification
-        showSuccessNotification(`Added ${returnedPerson.name}`)
+        showNotification(`Added ${returnedPerson.name}`, false)
         // Reset states
         setNewName('')
         setNewNumber('')
@@ -96,10 +96,16 @@ const App = () => {
     const person = persons.find(p => p.id === id)
     if(window.confirm(`Delete ${person.name}?`)){
       personService
-      .deletePerson(id)
-      .then(() => {
-        setPersons(persons.filter(person => person.id !== id))
-      })
+        .deletePerson(id)
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id))
+          showNotification(`Deleted ${person.name}`, false)
+        })
+        .catch( error => {
+          setPersons(persons.filter(person => person.id !== id))
+          console.error('Failed to delete person:', error)
+          showNotification(`Information of ${person.name} has already been removed from server`, true)
+        })
     }
   }
 
@@ -107,7 +113,8 @@ const App = () => {
     <div>
       {/* Header */}
       <h2>Phonebook</h2>
-      <Notification message={successMessage} isError={false}/>
+      {/* Show notification */}
+      <Notification message={notification.message} isError={notification.isError}/>
 
       {/* filter contacts by name */}
       <Filter value={newFilter} onChange={handleFilterChange}/>
