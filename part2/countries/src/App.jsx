@@ -1,11 +1,43 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Countries from "./components/Countries";
+import Country from "./components/CountryBasic";
+import Filter from "./components/Filter";
+import countryService from './services/countries'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [countries, setCountries] = useState([])
+  const [newFilter, setNewFilter] = useState("");
+
+    // Get countries from api
+    useEffect( () => {
+      countryService
+        .getAll()
+        .then(allCountries => {
+          console.log('promise fulfilled, data fetched from server')
+          setCountries(allCountries)
+        })
+    }, [])
+
+  const handleFilterChange = (event) => {
+    // console.log(event.target.value)
+    setNewFilter(event.target.value);
+  }
+
+  const handleShow = (countryName) => {
+    console.log(`pressed show button of ${countryName}`)
+  }
 
   return (
     <div>
-      Hello
+      {/* Header */}
+      <h2>Countries App</h2>
+
+      {/* filter countries by name */}
+      <Filter value={newFilter} onChange={handleFilterChange}/>
+
+      {/* Countries */}
+      <Countries countries={countries} newFilter={newFilter} handleShow={handleShow}/>
+
     </div>
   )
 }
