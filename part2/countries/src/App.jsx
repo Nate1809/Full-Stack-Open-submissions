@@ -23,6 +23,10 @@ function App() {
     setNewFilter(event.target.value);
   }
 
+  const handleFilterReset = () => {
+    setNewFilter("");
+  }
+
   const handleShow = (countryName) => {
     console.log(`pressed show button of ${countryName}`)
   }
@@ -36,7 +40,11 @@ function App() {
       <Filter value={newFilter} onChange={handleFilterChange}/>
 
       {/* Countries */}
-      <Countries countries={countries} newFilter={newFilter} handleShow={handleShow}/>
+      <Countries 
+        countries={countries} 
+        newFilter={newFilter}
+        onFilterReset={handleFilterReset}
+      />
 
     </div>
   )

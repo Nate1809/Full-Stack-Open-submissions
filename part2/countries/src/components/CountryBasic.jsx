@@ -1,7 +1,7 @@
 const CountryBasic = ({country, handleShow}) => {
     return (
         <li>
-            {country.name.common} <button onClick={() => handleShow(country.name.common)} > Show </button>
+            {country.name.common} <button onClick={() => handleShow(country)} > Show </button>
         </li>
     )
 }
