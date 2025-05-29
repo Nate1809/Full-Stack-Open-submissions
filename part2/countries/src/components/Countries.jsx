@@ -29,7 +29,7 @@ const Countries = ( {countries, newFilter, onFilterReset} ) => {
 
     // Display different number of countries
     if (countriesToShow.length === 1) {
-        setSelectedCountry(countriesToShow[0])
+        // setSelectedCountry(countriesToShow[0])
         return <CountryFull country={countriesToShow[0]} handleBack={handleBack}/>
     } else if (countriesToShow.length <= 10) {
         return (
