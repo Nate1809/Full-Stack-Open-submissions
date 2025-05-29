@@ -1,6 +1,6 @@
 const Notification = ({ message, isError }) => {
     if (message === null) {
-    return null
+        return null
     }
 
     const errorStyle = {
@@ -24,7 +24,7 @@ const Notification = ({ message, isError }) => {
     }
 
     const notificationStyle = isError ? errorStyle : successStyle
-    
+
     return (
         <div style={notificationStyle}>
             {message}

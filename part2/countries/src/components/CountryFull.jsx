@@ -1,8 +1,9 @@
-const CountryFull = ( {country} ) => {
+const CountryFull = ( {country, handleBack} ) => {
     return (
         <div>
             <h1>{country.name.common}</h1>
-            Capital: {country.capital}
+            <p>Capital: {country.capital}</p>
+            <p>Area: {country.area}</p>
             {/* Languages */}
             <h2>Languages</h2>
             <ul>
@@ -12,6 +13,7 @@ const CountryFull = ( {country} ) => {
             </ul>
             {/* Flag */}
             <img src={country.flags.png} alt={`Flag of ${country.name.common}`} width="150" />
+            <div><button onClick={handleBack}>Back</button></div>
         </div>
     )
 }
