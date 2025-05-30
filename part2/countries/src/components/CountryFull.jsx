@@ -9,9 +9,10 @@ const CountryFull = ( {country, handleBack} ) => {
     // Get countries from api
     useEffect( () => {
         weatherService
-            .getWeather(country.name.common)
+            .getWeather(country.capital)
             .then(curWeather => {
                 console.log('promise fulfilled, weather fetched from server')
+                console.log(curWeather.weather[0].icon)
                 setWeather(curWeather)
             })
     }, [])
@@ -34,6 +35,7 @@ const CountryFull = ( {country, handleBack} ) => {
             {weather ? (
                 <div>
                     <p>Temperature: {weather.main.temp}°C</p>
+                    <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} width="100" />
                     <p>Wind Speed: {weather.wind.speed} m/s</p>
                 </div>
             ) : (
