@@ -34,6 +34,15 @@ app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+// The page has to show the time that the request was received and how many entries are in the phonebook at the time of processing the request.
+app.get('/info', (request, response) => {
+    const numEntries = persons.length
+    response.send(
+        `<p>Phonebook has info for ${numEntries} people</p> 
+                <p>${new Date()}</p>`
+    )
+})
+
 // Finally we need to start our server
 const PORT = 3001
 app.listen(PORT, () => {
