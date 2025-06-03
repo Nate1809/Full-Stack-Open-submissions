@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-//app.use(express.json()) // to use for post requests
+app.use(express.json()) // to use for post requests
 
 // hardcoded data
 let persons = [
@@ -62,6 +62,38 @@ app.delete('/api/persons/:id', (request, response) => {
     console.log("Deleted person with id: " + id)
     response.status(204).end()
 })
+
+const generateID = () => {
+    let newId
+    do {
+        newId = Math.floor(Math.random() * 1_000_000).toString()
+    } while (persons.find(person => person.id === newId))
+    return newId
+}
+
+//POST a new person
+app.post('/api/persons', (request, response) => {
+    console.log('POST request received')
+    const body = request.body
+
+    // Check if name and number are in the request body
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'name and number are required'
+        })
+    }
+
+    const person = {
+        id: generateID(),
+        name: body.name,
+        number: body.number
+    }
+
+    persons.push(person) // ✅ actually modifies the array
+    response.json(person)
+})
+
+
 
 // Finally we need to start our server
 const PORT = 3001
