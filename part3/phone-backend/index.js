@@ -4,7 +4,7 @@ const app = express()
 //app.use(express.json()) // to use for post requests
 
 // hardcoded data
-const persons = [
+let persons = [
     {
         "id": "1",
         "name": "Arto Hellas",
@@ -34,6 +34,7 @@ app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+// GET a single person
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
     const person = persons.find(person => person.id === id)
@@ -45,13 +46,21 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-// The page has to show the time that the request was received and how many entries are in the phonebook at the time of processing the request.
+// GET info about the phonebook
 app.get('/info', (request, response) => {
     const numEntries = persons.length
     response.send(
         `<p>Phonebook has info for ${numEntries} people</p> 
                 <p>${new Date()}</p>`
     )
+})
+
+// DELETE a person
+app.delete('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    persons = persons.filter(person => person.id !== id)
+    console.log("Deleted person with id: " + id)
+    response.status(204).end()
 })
 
 // Finally we need to start our server
