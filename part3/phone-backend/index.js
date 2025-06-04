@@ -1,7 +1,19 @@
 const express = require('express')
 const app = express()
 
-app.use(express.json()) // to use for post requests
+// Middleware
+app.use(express.json())
+
+const requestLogger = (request, response, next) => {
+    console.log('Method:', request.method)
+    console.log('Path:  ', request.path)
+    console.log('Body:  ', request.body)
+    console.log('---')
+    next()
+}
+app.use(requestLogger)
+
+
 
 // hardcoded data
 let persons = [
@@ -76,14 +88,14 @@ app.post('/api/persons', (request, response) => {
     console.log('POST request received')
     const body = request.body
 
-    // Check if name and number are in the request body
+    // Check if the name and number are in the request body
     if (!body.name || !body.number) {
         return response.status(400).json({
             error: 'name and number are required'
         })
     }
 
-    // Check if name already exists
+    // Check if the name already exists
     if (persons.find(person => person.name === body.name)) {
         return response.status(400).json({
             error: 'name must be unique'
@@ -100,9 +112,14 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
 
 
-// Finally we need to start our server
+// Finally, we need to start our server
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
