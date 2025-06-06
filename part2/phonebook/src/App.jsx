@@ -74,6 +74,8 @@ const App = () => {
         // Reset states
         setNewName('')
         setNewNumber('')
+        // print request body
+        console.log(`Added ${returnedPerson.name} with number ${returnedPerson.number} and id ${returnedPerson.id}`)
       })
   };
 

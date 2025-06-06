@@ -2,8 +2,10 @@ const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
+const cors = require('cors')
 
 // Middleware
+app.use(cors())
 app.use(express.json())
 
 // Logging middleware using morgan
@@ -21,8 +23,6 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 //     next()
 // }
 // app.use(requestLogger)
-
-
 
 // hardcoded data
 let persons = [
@@ -121,6 +121,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
+// Error handling middleware
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
 }
