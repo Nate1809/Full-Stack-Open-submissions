@@ -1,5 +1,5 @@
 import axios from 'axios'
-const baseUrl = 'http://localhost:3001/api/persons' // now we are using the backend
+const baseUrl = '/api/persons' // relative path because we are in the same folder as the backend
 
 // return all persons
 const getAll = () => {

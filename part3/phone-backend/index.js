@@ -2,11 +2,12 @@ const express = require('express')
 const morgan = require('morgan')
 
 const app = express()
-const cors = require('cors')
+const cors = require('cors') // for cross-origin resource sharing (this means we can access the server from another domain)
 
 // Middleware
 app.use(cors())
 app.use(express.json())
+app.use(express.static('dist')) // this makes it so that we can access the files in the dist folder
 
 // Logging middleware using morgan
 morgan.token('body', (req) => {

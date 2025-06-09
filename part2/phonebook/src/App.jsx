@@ -12,7 +12,6 @@ const App = () => {
   const [newFilter, setNewFilter] = useState("");
   const [notification, setNotification] = useState({ message: null, isError: false })
 
-
   // Get persons from json server
   useEffect( () => {
     personService
