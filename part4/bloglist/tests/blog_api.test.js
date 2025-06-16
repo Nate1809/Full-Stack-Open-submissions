@@ -61,6 +61,23 @@ test('a valid blog can be added ', async () => {
   assert(contents.includes('Sei: Reimagining AI Therapy'))
 })
 
+test('note without content is not added', async () => {
+  const newNote = {
+    important: true
+  }
+
+  await api
+    .post('/api/notes')
+    .send(newNote)
+    .expect(400)
+
+
+  const notesAtEnd = await helper.notesInDb()
+
+
+  assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
