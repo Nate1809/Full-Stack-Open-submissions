@@ -38,6 +38,29 @@ test('unique identifier property is named id', async () => {
   }
 })
 
+test('a valid blog can be added ', async () => {
+  const newBlog = {
+    title: 'Sei: Reimagining AI Therapy',
+    author: 'Nathan Guzman',
+    url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
+    likes: 52
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+
+  const contents = blogsAtEnd.map(n => n.title)
+  assert(contents.includes('Sei: Reimagining AI Therapy'))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })

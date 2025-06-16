@@ -2,15 +2,15 @@ const Blog = require('../models/blog')
 
 const initialBlogs = [
   {
-    title: "Bolillos del mundo",
-    author: "Alameda Smith",
-    url: "https://bullterrier.world/blogs/all/bull-terriers-sunbathing-the-health-benefits-of-vitamin-d",
+    title: 'Bolillos del mundo',
+    author: 'Alameda Smith',
+    url: 'https://bullterrier.world/blogs/all/bull-terriers-sunbathing-the-health-benefits-of-vitamin-d',
     likes: 5999
   },
   {
-    title: "Stardew Valley Cookbook is now avaialble",
-    author: "Eric Barone",
-    url: "https://www.stardewvalley.net/the-stardew-valley-cookbook-is-now-available/",
+    title: 'Stardew Valley Cookbook is now avaialble',
+    author: 'Eric Barone',
+    url: 'https://www.stardewvalley.net/the-stardew-valley-cookbook-is-now-available/',
     likes: 5999
   }
 ]
