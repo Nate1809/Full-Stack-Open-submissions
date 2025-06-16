@@ -61,21 +61,22 @@ test('a valid blog can be added ', async () => {
   assert(contents.includes('Sei: Reimagining AI Therapy'))
 })
 
-test('note without content is not added', async () => {
-  const newNote = {
-    important: true
+test('blog without likes defaults to 0 likes', async () => {
+  const newBlog = {
+    title: 'Sei: Reimagining AI Therapy',
+    author: 'Nathan Guzman',
+    url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
   }
 
   await api
-    .post('/api/notes')
-    .send(newNote)
-    .expect(400)
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
 
-
-  const notesAtEnd = await helper.notesInDb()
-
-
-  assert.strictEqual(notesAtEnd.length, helper.initialNotes.length)
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+  assert.strictEqual(blogsAtEnd[blogsAtEnd.length - 1].likes, 0)
 })
 
 after(async () => {
