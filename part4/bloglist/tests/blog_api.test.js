@@ -28,6 +28,16 @@ test('all blogs are returned', async () => {
   assert.strictEqual(response.body.length, helper.initialBlogs.length)
 })
 
+test('unique identifier property is named id', async () => {
+  const response = await api.get('/api/blogs')
+  const blogs = response.body
+
+  for (const blog of blogs) {
+    assert.ok(blog.id, 'Expected blog to have an "id" field')
+    assert.strictEqual(blog._id, undefined, 'Expected blog not to have "_id" field')
+  }
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
