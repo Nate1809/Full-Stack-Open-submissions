@@ -153,6 +153,23 @@ describe('blog API', () => {
       .expect(401)
       .expect('Content-Type', /application\/json/)
   })
+
+  test('adding a blog without a token fails with 401', async () => {
+    const newBlog = {
+      title: 'Missing Token Blog',
+      author: 'No Auth',
+      url: 'http://notoken.com',
+      likes: 1
+    }
+
+    const result = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(result.body.error, 'token missing')
+  })
 })
 
 describe('deletion of a blog', () => {
@@ -168,6 +185,34 @@ describe('deletion of a blog', () => {
     assert(!contents.includes(blogToDelete.title))
 
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
+  })
+
+  test('fails with status 401 if user did not create the blog', async () => {
+    // Create a second user
+    const passwordHash = await bcrypt.hash('anotherpass', 10)
+    const otherUser = new User({ username: 'anotheruser', passwordHash })
+    await otherUser.save()
+
+    // Log in as the second user
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'anotheruser', password: 'anotherpass' })
+
+    const otherToken = loginResponse.body.token
+
+    // Attempt to delete a blog created by the first user
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    const result = await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(401)
+
+    assert.strictEqual(result.body.error, 'user not authorized to delete this blog')
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
   })
 })
 
