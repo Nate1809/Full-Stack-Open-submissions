@@ -12,106 +12,147 @@ const Blog = require('../models/blog')
 
 const api = supertest(app)
 
+let token
+
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
-  await Blog.insertMany(helper.initialBlogs)
-})
+  const passwordHash = await bcrypt.hash('sekret', 10)
+  const user = new User({ username: 'root', passwordHash })
+  await user.save()
 
-test('blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-})
+  const loginResponse = await api
+    .post('/api/login')
+    .send({ username: 'root', password: 'sekret' })
 
-test('all blogs are returned', async () => {
-  const response = await api.get('/api/blogs')
+  token = loginResponse.body.token
 
-  assert.strictEqual(response.body.length, helper.initialBlogs.length)
-})
-
-test('unique identifier property is named id', async () => {
-  const response = await api.get('/api/blogs')
-  const blogs = response.body
-
-  for (const blog of blogs) {
-    assert.ok(blog.id, 'Expected blog to have an "id" field')
-    assert.strictEqual(blog._id, undefined, 'Expected blog not to have "_id" field')
+  // Create blogs using the authenticated route
+  for (const blog of helper.initialBlogs) {
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(blog)
   }
 })
 
-test('a valid blog can be added ', async () => {
-  const newBlog = {
-    title: 'Sei: Reimagining AI Therapy',
-    author: 'Nathan Guzman',
-    url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
-    likes: 52
-  }
+describe('blog API', () => {
+  test('blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+  test('all blogs are returned', async () => {
+    const response = await api.get('/api/blogs')
+
+    assert.strictEqual(response.body.length, helper.initialBlogs.length)
+  })
+
+  test('unique identifier property is named id', async () => {
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+
+    for (const blog of blogs) {
+      assert.ok(blog.id, 'Expected blog to have an "id" field')
+      assert.strictEqual(blog._id, undefined, 'Expected blog not to have "_id" field')
+    }
+  })
+
+  test('a valid blog can be added ', async () => {
+    const newBlog = {
+      title: 'Sei: Reimagining AI Therapy',
+      author: 'Nathan Guzman',
+      url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
+      likes: 52
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
 
-  const blogsAtEnd = await helper.blogsInDb()
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
 
 
-  const contents = blogsAtEnd.map(n => n.title)
-  assert(contents.includes('Sei: Reimagining AI Therapy'))
-})
+    const contents = blogsAtEnd.map(n => n.title)
+    assert(contents.includes('Sei: Reimagining AI Therapy'))
+  })
 
-test('blog without likes defaults to 0 likes', async () => {
-  const newBlog = {
-    title: 'Sei: Reimagining AI Therapy',
-    author: 'Nathan Guzman',
-    url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
-  }
+  test('blog without likes defaults to 0 likes', async () => {
+    const newBlog = {
+      title: 'Sei: Reimagining AI Therapy',
+      author: 'Nathan Guzman',
+      url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-  const blogsAtEnd = await helper.blogsInDb()
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
-  assert.strictEqual(blogsAtEnd[blogsAtEnd.length - 1].likes, 0)
-})
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+    assert.strictEqual(blogsAtEnd[blogsAtEnd.length - 1].likes, 0)
+  })
 
-test('blog without title is not added', async () => {
-  const newBlog = {
-    author: 'Nathan Guzman',
-    url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
-  }
+  test('blog without title is not added', async () => {
+    const newBlog = {
+      author: 'Nathan Guzman',
+      url: 'https://medium.com/@nathanguzman/sei-reimagining-ai-therapy-with-googles-agent-development-kit-6d9e39088a93',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
 
-  const blogsAtEnd = await helper.blogsInDb()
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
-})
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
 
-test('blog without url is not added', async () => {
-  const newBlog = {
-    title: 'Sei: Reimagining AI Therapy',
-    author: 'Nathan Guzman',
-  }
+  test('blog without url is not added', async () => {
+    const newBlog = {
+      title: 'Sei: Reimagining AI Therapy',
+      author: 'Nathan Guzman',
+    }
 
-  await api
-    .post('/api/blogs')
-    .send(newBlog)
-    .expect(400)
-    .expect('Content-Type', /application\/json/)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
 
-  const blogsAtEnd = await helper.blogsInDb()
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+  })
+
+  test('adding a blog with invalid token fails with 401', async () => {
+    const newBlog = {
+      title: 'Unauthorized Blog',
+      author: 'Evil User',
+      url: 'http://malicious.com',
+      likes: 0
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', 'Bearer invalidtoken123')
+      .send(newBlog)
+      .expect(401)
+      .expect('Content-Type', /application\/json/)
+  })
 })
 
 describe('deletion of a blog', () => {
@@ -119,7 +160,7 @@ describe('deletion of a blog', () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+    await api.delete(`/api/blogs/${blogToDelete.id}`).set('Authorization', `Bearer ${token}`).expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
@@ -169,9 +210,9 @@ describe('when there is initially one user in db', () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
-      username: 'mluukkai',
-      name: 'Matti Luukkainen',
-      password: 'salainen',
+      username: 'gallinero',
+      name: 'Clucker Chicken',
+      password: 'burger',
     }
 
     await api
@@ -192,8 +233,8 @@ describe('when there is initially one user in db', () => {
 
     const newUser = {
       username: 'root',
-      name: 'Superuser',
-      password: 'salainen',
+      name: 'Clucker Chicken',
+      password: 'burger',
     }
 
     const result = await api
@@ -205,6 +246,42 @@ describe('when there is initially one user in db', () => {
     const usersAtEnd = await helper.usersInDb()
     assert(result.body.error.includes('expected `username` to be unique'))
 
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails with proper statuscode and message if password is too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const newUser = {
+      username: 'rata',
+      name: 'Walt Disney',
+      password: 'a',
+    }
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Both username and password must be given and both must be at least 3 characters long'))
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+  })
+
+  test('creation fails with proper statuscode and message if username is too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+    const newUser = {
+      username: 'a',
+      name: 'Walt Disney',
+      password: 'cool password bruh',
+    }
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    assert(result.body.error.includes('Both username and password must be given and both must be at least 3 characters long'))
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 })
