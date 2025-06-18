@@ -17,7 +17,7 @@ const App = () => {
 
   // hook to check local stored credentials
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
@@ -35,7 +35,7 @@ const App = () => {
 
       // Saving token to the browser's local storage
       window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
+        'loggedBloglistUser', JSON.stringify(user)
       )
       blogService.setToken(user.token)
       setUser(user)
@@ -77,12 +77,18 @@ const App = () => {
 
   )
 
+  const handleLogout = () => {
+    setUser(null)
+    window.localStorage.removeItem('loggedBloglistUser')
+    blogService.setToken(null)
+  }
+
   return (
     <div>
       {!user && loginForm()}
       {user && <div>
         <h2>blogs</h2>
-        <p>{user.name} logged in</p>
+        <p>{user.name} logged in</p><button onClick={ handleLogout }>logout</button>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
