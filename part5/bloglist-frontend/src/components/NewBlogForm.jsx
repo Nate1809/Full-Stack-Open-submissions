@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import PropTypes from 'prop-types'
 // const NewBlogForm = ({ createBlog})
 
 const NewBlogForm = ({ createBlog }) => {
@@ -61,6 +61,10 @@ const NewBlogForm = ({ createBlog }) => {
     </div>
 
   )
+}
+
+NewBlogForm.propTypes = {
+  createBlog: PropTypes.func.isRequired
 }
 
 export default NewBlogForm

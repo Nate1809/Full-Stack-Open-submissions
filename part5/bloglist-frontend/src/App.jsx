@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import NewBlogForm from "./components/NewBlogForm"
-import Notification from "./components/Notification"
-import Togglable from "./components/Togglable"
-import blog from "./components/Blog";
+import NewBlogForm from './components/NewBlogForm'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import blog from './components/Blog'
 
 
 const App = () => {
@@ -13,7 +13,7 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState({message: null, isError: false})
+  const [notification, setNotification] = useState({ message: null, isError: false })
 
   const blogFormRef = useRef()
 
@@ -21,8 +21,8 @@ const App = () => {
     blogService.getAll()
       .then(blogs => blogs.sort((a, b) => b.likes - a.likes))
       .then(sortedBlogs =>
-      setBlogs( sortedBlogs )
-    )
+        setBlogs( sortedBlogs )
+      )
   }, [])
 
   // hook to check local stored credentials
@@ -62,9 +62,9 @@ const App = () => {
 
   // Helper function for notifications
   const showNotification = (message, isError = false) => {
-    setNotification({message, isError})
+    setNotification({ message, isError })
     setTimeout(() => {
-      setNotification({message: null, isError: false})
+      setNotification({ message: null, isError: false })
     }, 5000)
   }
 

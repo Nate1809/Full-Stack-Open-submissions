@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
+
 const Blog = ({ blog, user, handleLike, handleRemove }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
   // Show the button for deleting a blog post only if the blog post was added by the user.
