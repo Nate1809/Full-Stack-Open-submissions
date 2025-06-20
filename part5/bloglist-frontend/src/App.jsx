@@ -5,6 +5,7 @@ import loginService from './services/login'
 import NewBlogForm from "./components/NewBlogForm"
 import Notification from "./components/Notification"
 import Togglable from "./components/Togglable"
+import blog from "./components/Blog";
 
 
 const App = () => {
@@ -57,6 +58,8 @@ const App = () => {
     }
   }
 
+
+
   // Helper function for notifications
   const showNotification = (message, isError = false) => {
     setNotification({message, isError})
@@ -69,7 +72,12 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try {
       const newBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(newBlog))
+
+      // The backend returns the creator only as an id, so add the full user
+      // object so Blog can immediately determine ownership without a refresh.
+      const blogWithUser = { ...newBlog, user }
+
+      setBlogs(blogs.concat(blogWithUser))
       showNotification(`A new blog ${blogObject.title} by ${blogObject.author} added`)
     } catch (error) {
       console.error(error)
@@ -137,6 +145,19 @@ const App = () => {
     }
   }
 
+  const handleRemove = async (blogToRemove) => {
+    if (window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)){
+      try {
+        await blogService.remove(blogToRemove.id)
+        setBlogs(blogs.filter(b => b.id !== blogToRemove.id))
+        showNotification(`Blog ${blogToRemove.title} by ${blogToRemove.author} removed`)
+      } catch (exception) {
+        showNotification('Failed to delete blog', true)
+      }
+    }
+
+  }
+
   return (
     <div>
       {/*Header*/}
@@ -153,7 +174,13 @@ const App = () => {
         <p>{user.name} logged in <button onClick={ handleLogout }>logout</button></p>
         { blogForm() }
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            user={user}
+            handleLike={handleLike}
+            handleRemove={handleRemove}
+          />
         )}
       </div>
       }

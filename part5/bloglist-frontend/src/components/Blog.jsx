@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, user, handleLike, handleRemove }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
+  // Show the button for deleting a blog post only if the blog post was added by the user.
+  const canShowRemove = user && blog.user && blog.user.username === user.username
 
   const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
   const showWhenVisible = { display: detailsVisible ? '' : 'none' }
@@ -25,6 +27,7 @@ const Blog = ({ blog, handleLike }) => {
         <p>{blog.url}</p>
         <p>{blog.likes} <button onClick={() => handleLike(blog) }>like</button></p>
         <p>{blog.author}</p>
+        {canShowRemove && <button onClick={() => handleRemove(blog)}>remove</button>}
       </div>
     </div>
   )
