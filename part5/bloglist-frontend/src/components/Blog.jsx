@@ -20,10 +20,10 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
 
   return (
     <div style={blogStyle}>
-      <div style={hideWhenVisible}>
+      <div style={hideWhenVisible} className="defaultBlogContent">
         {blog.title} {blog.author} <button onClick={() => setDetailsVisible(true)}>view</button>
       </div>
-      <div style={showWhenVisible}>
+      <div style={showWhenVisible} className="detailBlogContent">
         <p>{blog.title} <button onClick={() => setDetailsVisible(false)}>hide</button></p>
         <p>{blog.url}</p>
         <p>{blog.likes} <button onClick={() => handleLike(blog) }>like</button></p>
