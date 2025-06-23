@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
-describe('Blog Display', () => {
+describe('Blog', () => {
   const blog = {
     title: 'Bolillos del mundo',
     author: 'Alameda Smith',
@@ -35,5 +35,12 @@ describe('Blog Display', () => {
     expect(div).toHaveStyle('display: none')
   })
 
+  test('URL and likes displayed when show button clicked', async () => {
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+    await user.click(button)
 
+    const div = container.querySelector('.detailBlogContent')
+    expect(div).not.toHaveStyle('display: none')
+  })
 })
