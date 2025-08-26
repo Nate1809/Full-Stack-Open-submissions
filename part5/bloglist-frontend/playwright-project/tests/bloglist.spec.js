@@ -46,4 +46,15 @@ describe('Blog app', () => {
       await expect(page.getByText('Matti Luukkainen logged in')).not.toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, 'mluukkai', 'salainen')
+    })
+
+    test('a new blog can be created', async ({ page }) => {
+      await createBlog(page, 'Bull terriers blog', 'Mr Bolillo', 'https://en.wikipedia.org/wiki/Bull_Terrier')
+      await expect(page.getByText('Bull terriers blog Mr Bolillo')).toBeVisible()
+    })
+  })
 })
