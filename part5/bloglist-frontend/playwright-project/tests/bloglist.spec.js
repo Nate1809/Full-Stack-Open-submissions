@@ -56,5 +56,18 @@ describe('Blog app', () => {
       await createBlog(page, 'Bull terriers blog', 'Mr Bolillo', 'https://en.wikipedia.org/wiki/Bull_Terrier')
       await expect(page.getByText('Bull terriers blog Mr Bolillo')).toBeVisible()
     })
+
+    test.describe('and a blog exists', () => {
+      test.beforeEach(async ( { page } ) => {
+        await createBlog(page, 'first blog', 'first author', 'wikipedia.org')
+      })
+      test('the blog can be liked', async ({ page }) => {
+        await page.getByText('first blog first author').click()
+        await page.getByRole('button', { name: 'view' }).click()
+        await expect(page.getByText('0 like')).toBeVisible()
+        await page.getByRole('button', { name: 'like' }).click()
+        await expect(page.getByText('1 like')).toBeVisible()
+      })
+    })
   })
 })
