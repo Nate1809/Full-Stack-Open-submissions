@@ -5,12 +5,19 @@ describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
     // empty the db here
     await request.post('api/testing/reset')
-    // create a user for the backend here
+    // create users for the backend here
     await request.post('/api/users', {
       data: {
         name: 'Matti Luukkainen',
         username: 'mluukkai',
         password: 'salainen'
+      }
+    })
+    await request.post('/api/users', {
+      data: {
+        name: 'Noria de Mexico',
+        username: 'noria',
+        password: 'mexico'
       }
     })
     // go to bloglist app
@@ -57,7 +64,7 @@ describe('Blog app', () => {
       await expect(page.getByText('Bull terriers blog Mr Bolillo')).toBeVisible()
     })
 
-    test.describe('and a blog exists', () => {
+    test.describe('and a blog by user exists', () => {
       test.beforeEach(async ( { page } ) => {
         await createBlog(page, 'first blog', 'first author', 'wikipedia.org')
       })
@@ -71,7 +78,6 @@ describe('Blog app', () => {
       test('the blog can be deleted by user who added it', async ({ page }) => {
         await page.getByText('first blog first author').click()
         await page.getByRole('button', { name: 'view' }).click()
-        
         page.on('dialog', dialog => dialog.accept())
         await page.getByRole('button', { name: 'remove' }).click()
         await page.getByText('Blog first blog by first author removed').waitFor()
@@ -80,5 +86,20 @@ describe('Blog app', () => {
         await expect(page.getByText('like')).not.toBeVisible()
       })
     })
+    test('only the user who added the blog sees the blog delete button', async ({ page }) => {
+      // original logout
+      await page.getByRole('button', { name: 'logout' }).click()
+      // stranger login and create blog
+      await loginWith(page, 'noria', 'mexico')
+      await createBlog(page, 'first blog', 'first author', 'wikipedia.org')
+      //stranger logout
+      await page.getByRole('button', { name: 'logout' }).click()
+      // login original
+      await loginWith(page, 'mluukkai', 'salainen')
+      // test if can delete stranger's blog
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByText('remove')).not.toBeVisible()
+    })
   })
+
 })
