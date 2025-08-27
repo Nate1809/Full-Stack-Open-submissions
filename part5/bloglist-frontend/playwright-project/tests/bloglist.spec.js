@@ -68,6 +68,17 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'like' }).click()
         await expect(page.getByText('1 like')).toBeVisible()
       })
+      test('the blog can be deleted by user who added it', async ({ page }) => {
+        await page.getByText('first blog first author').click()
+        await page.getByRole('button', { name: 'view' }).click()
+        
+        page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'remove' }).click()
+        await page.getByText('Blog first blog by first author removed').waitFor()
+        // check blog no longer there
+        await expect(page.getByText('first blog first author')).not.toBeVisible()
+        await expect(page.getByText('like')).not.toBeVisible()
+      })
     })
   })
 })
