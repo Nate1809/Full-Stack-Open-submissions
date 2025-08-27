@@ -69,7 +69,6 @@ describe('Blog app', () => {
         await createBlog(page, 'first blog', 'first author', 'wikipedia.org')
       })
       test('the blog can be liked', async ({ page }) => {
-        await page.getByText('first blog first author').click()
         await page.getByRole('button', { name: 'view' }).click()
         await expect(page.getByText('0 like')).toBeVisible()
         await page.getByRole('button', { name: 'like' }).click()
@@ -99,6 +98,47 @@ describe('Blog app', () => {
       // test if can delete stranger's blog
       await page.getByRole('button', { name: 'view' }).click()
       await expect(page.getByText('remove')).not.toBeVisible()
+    })
+    test('blogs are arranged in the order according to the likes', async ({ page }) => {
+      // create 3 blogs
+      await createBlog(page, 'one like blog', 'one author', 'wikipedia.org')
+      await createBlog(page, 'three like blog', 'three author', 'wikipedia.org')
+      await createBlog(page, 'two like blog', 'two author', 'wikipedia.org')
+
+      // add likes
+      await page.locator('div').filter({ hasText: /^one like blog one author view$/ }).getByRole('button').click()
+      await page.getByRole('button', { name: 'like' }).click()
+      await page.getByRole('paragraph').filter({ hasText: '1 like' }).waitFor()
+      await page.getByRole('button', { name: 'hide' }).click()
+
+      await page.pause()
+
+
+      await page.locator('div').filter({ hasText: /^two like blog two author view$/ }).getByRole('button').click()
+      for (let i = 0; i < 2; i++) {
+        await page.getByRole('button', { name: 'like' }).click()
+        await page.getByRole('paragraph').filter({ hasText: (i + 1) + ' like' }).waitFor()
+      }
+      await page.getByRole('button', { name: 'hide' }).click()
+
+
+      await page.locator('div').filter({ hasText: /^three like blog three author view$/ }).getByRole('button').click()
+      for (let i = 0; i < 3; i++) {
+        await page.getByRole('button', { name: 'like' }).click()
+        await page.getByRole('paragraph').filter({ hasText: (i + 1) + ' like' }).waitFor()
+      }
+      await page.getByRole('button', { name: 'hide' }).click()
+
+      //reload page
+      await page.reload()
+
+      // make sure order is three like blog -> two like blog -> one like blog
+      await page.pause()
+      const blogs = page.locator('.defaultBlogContent')
+      await expect(blogs.nth(0)).toContainText('three like blog three author')
+      await expect(blogs.nth(1)).toContainText('two like blog two author')
+      await expect(blogs.nth(2)).toContainText('one like blog one author')
+
     })
   })
 
