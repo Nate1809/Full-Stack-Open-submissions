@@ -4,11 +4,14 @@ const notificationSlice = createSlice({
   name: 'notification',
   initialState: '', // what should the state hold? maybe text and can it be null?
   reducers: {
-    modifyNotification: (state, action) => {
+    setNotification: (state, action) => {
       return action.payload
+    },
+    clearNotification: (state, action) => {
+      return ''
     }
   }
 })
 
-export const { modifyNotification } = notificationSlice.actions
+export const { setNotification, clearNotification } = notificationSlice.actions
 export default notificationSlice.reducer
