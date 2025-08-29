@@ -26,27 +26,33 @@ const anecdoteSlice = createSlice({
   name: 'anecdote',
   initialState: [],
   reducers: {
-    voteAnecdote: (state, action) => {
-      const id = action.payload // because we pass the id as payload
-      const anecdoteToChange = state.find(n => n.id === id)
-      const changedAnecdote = {
-        ...anecdoteToChange,
-        votes: (anecdoteToChange.votes + 1)
-      }
-      return state.map(anecdote =>
-        anecdote.id !== id ? anecdote : changedAnecdote
-      )
-    },
+    // voteAnecdote: (state, action) => {
+    //   const id = action.payload // because we pass the id as payload
+    //   const anecdoteToChange = state.find(n => n.id === id)
+    //   const changedAnecdote = {
+    //     ...anecdoteToChange,
+    //     votes: (anecdoteToChange.votes + 1)
+    //   }
+    //   return state.map(anecdote =>
+    //     anecdote.id !== id ? anecdote : changedAnecdote
+    //   )
+    // },
     setAnecdotes: (state, action) => {
       return action.payload
     },
     appendAnecdote: (state, action) => {
       state.push(action.payload)
+    },
+    updateAnecdote: (state, action) => {
+      const updatedAnecdote = action.payload
+      return state.map(anecdote => 
+        anecdote.id !== updatedAnecdote.id ? anecdote : updatedAnecdote
+      )
     }
   }
 })
 
-export const { appendAnecdote, voteAnecdote, setAnecdotes } = anecdoteSlice.actions
+export const { appendAnecdote, setAnecdotes, updateAnecdote } = anecdoteSlice.actions
 
 // async action creators
 export const initializeAnecdotes = () => {
@@ -60,6 +66,18 @@ export const createAnecdote = content => {
   return async dispatch => {
     const newAnecdote = await anecdoteService.createNew(content)
     dispatch(appendAnecdote(newAnecdote))
+  }
+}
+
+export const voteAnecdote = id => {
+  return async (dispatch, getState) => {
+    const anecdoteToChange = getState().anecdotes.find(n => n.id === id)
+    const changedAnecdote = {
+      ...anecdoteToChange,
+      votes: anecdoteToChange.votes + 1
+    }
+    const updatedAnecdote = await anecdoteService.update(id, changedAnecdote)
+    dispatch(updateAnecdote(updatedAnecdote))
   }
 }
 
