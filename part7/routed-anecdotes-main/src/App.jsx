@@ -27,8 +27,21 @@ const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
     <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+      {anecdotes.map(anecdote =>
+        <li key={anecdote.id} >
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
+      )}
     </ul>
+  </div>
+)
+
+const Anecdote = ({ anecdote, vote }) => (
+  <div>
+    <h2>{anecdote.content} by {anecdote.author}</h2>
+    <p>has {anecdote.votes} votes</p>
+    <p>For more info see <a href={anecdote.info}>{anecdote.info}</a></p>
+    <button onClick={() => vote(anecdote.id)}>vote</button>
   </div>
 )
 
@@ -118,6 +131,9 @@ const App = () => {
     setAnecdotes(anecdotes.concat(anecdote))
   }
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdoteId = match ? parseInt(match.params.id) : null
+
   const anecdoteById = (id) =>
     anecdotes.find(a => a.id === id)
 
@@ -140,6 +156,7 @@ const App = () => {
         <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />}/>
         <Route path="/about" element={<About />}/>
         <Route path="/create-new" element={<CreateNew addNew={addNew} />}/>
+        <Route path="/anecdotes/:id" element={<Anecdote anecdote={ anecdoteById(anecdoteId) } vote={vote} />}/>
       </Routes>
       <Footer />
     </div>
