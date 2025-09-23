@@ -1,6 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useEffect } from 'react'
+import { Card, Button, Badge } from 'react-bootstrap'
 import { initializeBlogs, likeBlog, deleteBlog, loadComments, createComment } from '../reducers/blogSlice'
 import { showNotificationWithTimeout } from '../reducers/notificationSlice'
 import Comments from './Comments'
@@ -59,21 +60,43 @@ const BlogPost = () => {
 
   return (
     <div>
-      <h2>{blog.title} {blog.author}</h2>
-      <div>
-        <a href={blog.url} target="_blank" rel="noopener noreferrer">{blog.url}</a>
-      </div>
-      <div>
-        {blog.likes} likes <button onClick={handleLike}>like</button>
-      </div>
-      <div>
-        added by {blog.user ? blog.user.name : 'unknown'}
-      </div>
-      {canShowRemove && (
-        <div>
-          <button onClick={handleRemove}>remove</button>
-        </div>
-      )}
+      <Card className="mb-4">
+        <Card.Header>
+          <Card.Title className="mb-0">{blog.title}</Card.Title>
+          <small className="text-muted">by {blog.author}</small>
+        </Card.Header>
+        <Card.Body>
+          <div className="mb-3">
+            <strong>URL: </strong>
+            <a href={blog.url} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+              {blog.url}
+            </a>
+          </div>
+
+          <div className="mb-3">
+            <Badge bg="primary" className="me-2">
+              {blog.likes} likes
+            </Badge>
+            <Button variant="outline-primary" size="sm" onClick={handleLike}>
+              👍 Like
+            </Button>
+          </div>
+
+          <div className="mb-3">
+            <small className="text-muted">
+              Added by {blog.user ? blog.user.name : 'unknown'}
+            </small>
+          </div>
+
+          {canShowRemove && (
+            <div className="mb-3">
+              <Button variant="danger" size="sm" onClick={handleRemove}>
+                🗑️ Remove
+              </Button>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
 
       <Comments comments={blog.comments} />
       <CommentForm onSubmit={handleComment} />

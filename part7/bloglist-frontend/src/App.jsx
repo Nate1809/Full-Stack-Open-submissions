@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route, Link } from 'react-router-dom'
+import { Container, Navbar, Nav, Button, Form, Card } from 'react-bootstrap'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
 import BlogList from './components/BlogList'
@@ -17,10 +18,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
   const user = useSelector(state => state.user)
-
-  const padding = {
-    padding: 5
-  }
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -48,34 +45,38 @@ const App = () => {
   }
 
   const loginForm = () => (
-    <div>
-      <h2>login to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>
-            username
-            <input
-              type="text"
-              value={username}
-              name="Username"
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            password
-            <input
-              type="password"
-              value={password}
-              name="Password"
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </label>
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </div>
+    <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+      <Card style={{ width: '400px' }}>
+        <Card.Body>
+          <Card.Title className="text-center mb-4">Login to Application</Card.Title>
+          <Form onSubmit={handleLogin}>
+            <Form.Group className="mb-3">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
+                value={username}
+                name="Username"
+                placeholder="Enter username"
+                onChange={({ target }) => setUsername(target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                value={password}
+                name="Password"
+                placeholder="Enter password"
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </Form.Group>
+            <Button variant="primary" type="submit" className="w-100">
+              Login
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
   )
 
   if (!user) {
@@ -89,23 +90,36 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        <Link style={padding} to="/">blogs</Link>
-        <Link style={padding} to="/users">users</Link>
-      </div>
-      <div>
-        <span>{user.name} logged in</span>
-        <button onClick={handleLogout} style={{ marginLeft: '10px' }}>logout</button>
-      </div>
+      <Navbar bg="primary" variant="dark" expand="lg" className="mb-4">
+        <Container>
+          <Navbar.Brand href="/">Blog App</Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link as={Link} to="/">Blogs</Nav.Link>
+              <Nav.Link as={Link} to="/users">Users</Nav.Link>
+            </Nav>
+            <Nav>
+              <Navbar.Text className="me-3">
+                {user.name} logged in
+              </Navbar.Text>
+              <Button variant="outline-light" onClick={handleLogout}>
+                Logout
+              </Button>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
 
-      <Notification />
-
-      <Routes>
-        <Route path="/blogs/:id" element={<BlogPost />} />
-        <Route path="/users/:id" element={<User />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/" element={<BlogList />} />
-      </Routes>
+      <Container>
+        <Notification />
+        <Routes>
+          <Route path="/blogs/:id" element={<BlogPost />} />
+          <Route path="/users/:id" element={<User />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/" element={<BlogList />} />
+        </Routes>
+      </Container>
     </div>
   )
 }

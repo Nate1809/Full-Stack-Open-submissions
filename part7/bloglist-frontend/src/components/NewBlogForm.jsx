@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
-// const NewBlogForm = ({ createBlog})
+import { Form, Button, Card } from 'react-bootstrap'
 
 const NewBlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
@@ -21,52 +21,49 @@ const NewBlogForm = ({ createBlog }) => {
   }
 
   return (
-    <div>
-      <h2>add a new blog</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          <label>
-            title:
-            <input
+    <Card className="mb-4">
+      <Card.Body>
+        <Card.Title>Add a New Blog</Card.Title>
+        <Form onSubmit={addBlog}>
+          <Form.Group className="mb-3">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
               type="text"
               value={title}
               name="Title"
-              placeholder="title"
+              placeholder="Enter blog title"
               onChange={({ target }) => setTitle(target.value)}
             />
-          </label>
-        </div>
+          </Form.Group>
 
-        <div>
-          <label>
-            author:
-            <input
+          <Form.Group className="mb-3">
+            <Form.Label>Author</Form.Label>
+            <Form.Control
               type="text"
               value={author}
               name="Author"
-              placeholder="author"
+              placeholder="Enter author name"
               onChange={({ target }) => setAuthor(target.value)}
             />
-          </label>
-        </div>
+          </Form.Group>
 
-        <div>
-          <label>
-            url:
-            <input
+          <Form.Group className="mb-3">
+            <Form.Label>URL</Form.Label>
+            <Form.Control
               type="text"
               value={url}
               name="URL"
-              placeholder="url"
+              placeholder="Enter blog URL"
               onChange={({ target }) => setUrl(target.value)}
             />
-          </label>
+          </Form.Group>
 
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-
+          <Button variant="success" type="submit">
+            Create
+          </Button>
+        </Form>
+      </Card.Body>
+    </Card>
   )
 }
 
