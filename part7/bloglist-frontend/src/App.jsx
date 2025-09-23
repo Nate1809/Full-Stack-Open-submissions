@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -7,24 +7,21 @@ import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { showNotificationWithTimeout } from './reducers/notificationSlice'
+import { initializeBlogs, createBlog } from './reducers/blogSlice'
 
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const dispatch = useDispatch()
+  const blogs = useSelector(state => state.blogs)
 
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll()
-      .then(blogs => blogs.sort((a, b) => b.likes - a.likes))
-      .then(sortedBlogs =>
-        setBlogs( sortedBlogs )
-      )
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   // hook to check local stored credentials
   useEffect(() => {
@@ -65,13 +62,7 @@ const App = () => {
   const handleCreate = async (blogObject) => {
     blogFormRef.current.toggleVisibility()
     try {
-      const newBlog = await blogService.create(blogObject)
-
-      // The backend returns the creator only as an id, so add the full user
-      // object so Blog can immediately determine ownership without a refresh.
-      const blogWithUser = { ...newBlog, user }
-
-      setBlogs(blogs.concat(blogWithUser))
+      await dispatch(createBlog(blogObject))
       dispatch(showNotificationWithTimeout(`A new blog ${blogObject.title} by ${blogObject.author} added`))
     } catch (error) {
       console.error(error)
