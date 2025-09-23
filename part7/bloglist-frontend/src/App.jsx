@@ -90,8 +90,10 @@ const App = () => {
       <div>
         <Link style={padding} to="/">blogs</Link>
         <Link style={padding} to="/users">users</Link>
-        <span style={padding}>{user.name} logged in</span>
-        <button onClick={handleLogout}>logout</button>
+      </div>
+      <div>
+        <span>{user.name} logged in</span>
+        <button onClick={handleLogout} style={{ marginLeft: '10px' }}>logout</button>
       </div>
 
       <Notification />
