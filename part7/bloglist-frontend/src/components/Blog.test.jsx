@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
-import NewBlogForm from "./NewBlogForm.jsx";
+import NewBlogForm from './NewBlogForm.jsx'
 
 describe('Blog', () => {
   const blog = {
