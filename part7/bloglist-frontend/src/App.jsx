@@ -5,6 +5,8 @@ import blogService from './services/blogs'
 import Notification from './components/Notification'
 import BlogList from './components/BlogList'
 import Users from './components/Users'
+import User from './components/User'
+import BlogPost from './components/BlogPost'
 import { showNotificationWithTimeout } from './reducers/notificationSlice'
 import { initializeBlogs } from './reducers/blogSlice'
 import { loginUser, logoutUser, initializeUser } from './reducers/userSlice'
@@ -99,6 +101,8 @@ const App = () => {
       <Notification />
 
       <Routes>
+        <Route path="/blogs/:id" element={<BlogPost />} />
+        <Route path="/users/:id" element={<User />} />
         <Route path="/users" element={<Users />} />
         <Route path="/" element={<BlogList />} />
       </Routes>

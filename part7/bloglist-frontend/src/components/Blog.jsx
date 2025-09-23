@@ -1,15 +1,6 @@
-import { useState } from 'react'
-import blogService from '../services/blogs'
+import { Link } from 'react-router-dom'
 
-
-const Blog = ({ blog, user, handleLike, handleRemove }) => {
-  const [detailsVisible, setDetailsVisible] = useState(false)
-  // Show the button for deleting a blog post only if the blog post was added by the user.
-  const canShowRemove = user && blog.user && blog.user.username === user.username
-
-  const hideWhenVisible = { display: detailsVisible ? 'none' : '' }
-  const showWhenVisible = { display: detailsVisible ? '' : 'none' }
-
+const Blog = ({ blog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -20,16 +11,10 @@ const Blog = ({ blog, user, handleLike, handleRemove }) => {
 
   return (
     <div style={blogStyle}>
-      <div style={hideWhenVisible} className="defaultBlogContent">
-        {blog.title} {blog.author} <button onClick={() => setDetailsVisible(true)}>view</button>
-      </div>
-      <div style={showWhenVisible} className="detailBlogContent">
-        <p>{blog.title} <button onClick={() => setDetailsVisible(false)}>hide</button></p>
-        <p>{blog.url}</p>
-        <p>{blog.likes} <button onClick={() => handleLike(blog) }>like</button></p>
-        <p>{blog.author}</p>
-        {canShowRemove && <button onClick={() => handleRemove(blog)}>remove</button>}
-      </div>
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title}
+      </Link>
+      {' '}{blog.author}
     </div>
   )
 }
