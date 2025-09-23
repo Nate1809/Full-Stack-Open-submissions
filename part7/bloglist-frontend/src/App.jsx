@@ -2,20 +2,20 @@ import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import loginService from './services/login'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { showNotificationWithTimeout } from './reducers/notificationSlice'
-import { initializeBlogs, createBlog } from './reducers/blogSlice'
+import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogSlice'
+import { loginUser, logoutUser, initializeUser } from './reducers/userSlice'
 
 
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
 
   const blogFormRef = useRef()
 
@@ -25,28 +25,14 @@ const App = () => {
 
   // hook to check local stored credentials
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
-  }, [])
+    dispatch(initializeUser())
+  }, [dispatch])
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
-      const user = await loginService.login({
-        username, password,
-      })
-
-      // Saving token to the browser's local storage
-      window.localStorage.setItem(
-        'loggedBloglistUser', JSON.stringify(user)
-      )
-      blogService.setToken(user.token)
-      setUser(user)
+      await dispatch(loginUser({ username, password }))
       setUsername('')
       setPassword('')
       dispatch(showNotificationWithTimeout('Logged in'))
@@ -103,9 +89,7 @@ const App = () => {
   )
 
   const handleLogout = () => {
-    setUser(null)
-    window.localStorage.removeItem('loggedBloglistUser')
-    blogService.setToken(null)
+    dispatch(logoutUser())
   }
 
   const blogForm = () => {
@@ -119,16 +103,8 @@ const App = () => {
   }
 
   const handleLike = async (likedBlog) => {
-    const updatedBlog = {
-      ...likedBlog,
-      likes: likedBlog.likes + 1
-    }
-
     try {
-      const returnedBlog = await blogService.update(updatedBlog, likedBlog.id)
-      setBlogs(blogs.map(blog =>
-        blog.id === likedBlog.id ? returnedBlog : blog
-      ))
+      await dispatch(likeBlog(likedBlog))
     } catch (error) {
       dispatch(showNotificationWithTimeout('Failed to update likes', true))
     }
@@ -137,14 +113,12 @@ const App = () => {
   const handleRemove = async (blogToRemove) => {
     if (window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)){
       try {
-        await blogService.remove(blogToRemove.id)
-        setBlogs(blogs.filter(b => b.id !== blogToRemove.id))
+        await dispatch(deleteBlog(blogToRemove.id))
         dispatch(showNotificationWithTimeout(`Blog ${blogToRemove.title} by ${blogToRemove.author} removed`))
       } catch (exception) {
         dispatch(showNotificationWithTimeout('Failed to delete blog', true))
       }
     }
-
   }
 
   return (
