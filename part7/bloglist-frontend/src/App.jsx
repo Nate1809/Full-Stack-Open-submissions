@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import Blog from './components/Blog'
+import { Routes, Route, Link } from 'react-router-dom'
 import blogService from './services/blogs'
-import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
-import Togglable from './components/Togglable'
+import BlogList from './components/BlogList'
+import Users from './components/Users'
 import { showNotificationWithTimeout } from './reducers/notificationSlice'
-import { initializeBlogs, createBlog, likeBlog, deleteBlog } from './reducers/blogSlice'
+import { initializeBlogs } from './reducers/blogSlice'
 import { loginUser, logoutUser, initializeUser } from './reducers/userSlice'
 
 
@@ -14,16 +14,16 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
-  const blogs = useSelector(state => state.blogs)
   const user = useSelector(state => state.user)
 
-  const blogFormRef = useRef()
+  const padding = {
+    padding: 5
+  }
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
-  // hook to check local stored credentials
   useEffect(() => {
     dispatch(initializeUser())
   }, [dispatch])
@@ -37,23 +37,12 @@ const App = () => {
       setPassword('')
       dispatch(showNotificationWithTimeout('Logged in'))
     } catch (exception) {
-      // Show notification
       dispatch(showNotificationWithTimeout('Wrong username or password', true))
     }
   }
 
-
-
-
-  const handleCreate = async (blogObject) => {
-    blogFormRef.current.toggleVisibility()
-    try {
-      await dispatch(createBlog(blogObject))
-      dispatch(showNotificationWithTimeout(`A new blog ${blogObject.title} by ${blogObject.author} added`))
-    } catch (error) {
-      console.error(error)
-      dispatch(showNotificationWithTimeout('Blog creation failed', true))
-    }
+  const handleLogout = () => {
+    dispatch(logoutUser())
   }
 
   const loginForm = () => (
@@ -85,69 +74,32 @@ const App = () => {
         <button type="submit">login</button>
       </form>
     </div>
-
   )
 
-  const handleLogout = () => {
-    dispatch(logoutUser())
-  }
-
-  const blogForm = () => {
+  if (!user) {
     return (
-      <Togglable buttonLabel='new blog' ref={ blogFormRef }>
-        <NewBlogForm
-          createBlog={handleCreate}
-        />
-      </Togglable>
+      <div>
+        <Notification />
+        {loginForm()}
+      </div>
     )
-  }
-
-  const handleLike = async (likedBlog) => {
-    try {
-      await dispatch(likeBlog(likedBlog))
-    } catch (error) {
-      dispatch(showNotificationWithTimeout('Failed to update likes', true))
-    }
-  }
-
-  const handleRemove = async (blogToRemove) => {
-    if (window.confirm(`Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`)){
-      try {
-        await dispatch(deleteBlog(blogToRemove.id))
-        dispatch(showNotificationWithTimeout(`Blog ${blogToRemove.title} by ${blogToRemove.author} removed`))
-      } catch (exception) {
-        dispatch(showNotificationWithTimeout('Failed to delete blog', true))
-      }
-    }
   }
 
   return (
     <div>
-      {/*Header*/}
-      <h2>blogs</h2>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        <Link style={padding} to="/users">users</Link>
+        <span style={padding}>{user.name} logged in</span>
+        <button onClick={handleLogout}>logout</button>
+      </div>
 
-      {/*Show notification*/}
       <Notification />
 
-      {/*Login*/}
-      {!user && loginForm()}
-
-      {/*Show blogs*/}
-      {user && <div>
-        <p>{user.name} logged in <button onClick={ handleLogout }>logout</button></p>
-        { blogForm() }
-        {blogs.map(blog =>
-          <Blog
-            key={blog.id}
-            blog={blog}
-            user={user}
-            handleLike={handleLike}
-            handleRemove={handleRemove}
-          />
-        )}
-      </div>
-      }
-
+      <Routes>
+        <Route path="/users" element={<Users />} />
+        <Route path="/" element={<BlogList />} />
+      </Routes>
     </div>
   )
 }
