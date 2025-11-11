@@ -1,37 +1,33 @@
 # Dependencies
 node_modules/
+package-lock.json
 
-# Build output
-dist/
-build/
-coverage/
-
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
-
-# Logs
-logs/
-*.log
-npm-debug.log*
+.env.development
+.env.test
+.env.production
 
 # IDE
 .idea/
 .vscode/
-*.sublime-project
 *.sublime-workspace
+*.sublime-project
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Optional npm cache directory
-.npm
+# Logs and Debug
+logs/
+*.log
+npm-debug.log*
 
-# Optional eslint cache
-.eslintcache
-
-# Optional coverage directory
-.nyc_output
+# Build and Cache
+dist/
+build/
+.cache/
+coverage/
+.nyc_output/
 
