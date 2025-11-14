@@ -3,9 +3,9 @@ import { useMutation } from '@apollo/client'
 
 import { EDIT_AUTHOR } from '../queries'
 
-const AuthorForm = ( {setError} ) => {
+const AuthorForm = ( {authors, setError} ) => {
   const [name, setName] = useState('')
-  const [born, setBorn] = useState(0)
+  const [born, setBorn] = useState('')
 
   const [ editAuthor, result ] = useMutation(EDIT_AUTHOR)
 
@@ -17,10 +17,10 @@ const AuthorForm = ( {setError} ) => {
 
   const submit = async (event) => {
     event.preventDefault()
-    await editAuthor({ variables: { name, setBornTo: born } })
+    await editAuthor({ variables: { name, setBornTo: Number(born) } })
 
     setName('')
-    setBorn(0)
+    setBorn('')
   }
 
   return (
@@ -29,16 +29,24 @@ const AuthorForm = ( {setError} ) => {
 
       <form onSubmit={submit}>
         <div>
-          name <input
-          value={name}
-          onChange={({ target }) => setName(target.value)}
-        />
+          <select
+            value={name}
+            onChange={({ target }) => setName(target.value)}
+          >
+            <option value="">Select author...</option>
+            {authors.map((a) => (
+              <option key={a.name} value={a.name}>
+                {a.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           born <input
-          value={born}
-          onChange={({ target }) => setBorn(Number(target.value))}
-        />
+            type="number"
+            value={born}
+            onChange={({ target }) => setBorn(target.value)}
+          />
         </div>
         <button type='submit'>update author</button>
       </form>
